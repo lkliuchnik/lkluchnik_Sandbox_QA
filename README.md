@@ -1,2 +1,2 @@
 # lkluchnik_Sandbox_QA
-QA test Project
+My AQA learning repo 
