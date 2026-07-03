@@ -1,0 +1,13 @@
+{
+  "name": "qa-project-automation",
+  "version": "1.0.0",
+  "description": "QA Test Automation Project",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
+  }
+}
