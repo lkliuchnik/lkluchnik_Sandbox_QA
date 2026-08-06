@@ -1,14 +1,14 @@
 const { test, expect } = require('@playwright/test');
 
 test('Week 3', async ({ page }) => {
-  const BASE_URL = 'https://demoqa.com';
+  const BASE_URL = process.env.BASE_URL;
   const NAME = 'Test User';
-  const EMAIL = 'test.user@test.com';
+  const EMAIL = process.env.EMAIL;
   const CURRENT_ADDRESS = 'Dnipro';
   const PERMANENT_ADDRESS = 'Ukraine';
 
   await page.goto(BASE_URL);
-  await page.locator('.card.mt-4.top-card', { hasText: 'Elements' }).click();
+  await page.getByRole('heading', { name: 'Elements', exact: true }).click();
   await expect(page).toHaveURL(BASE_URL + '/elements');
 
   // check that left menu is shown
@@ -29,12 +29,16 @@ test('Week 3', async ({ page }) => {
   await page.locator('#submit').click();
 
   // check that output block is visible
-  const expected = page.locator('#output');
-  await expect(expected).toBeVisible();
+  const output = page.locator('#output');
+  await expect(output).toBeVisible();
+
+  const expected = output.locator('p');
 
   // check that all entered data is shown in the output
-  await expect(expected).toContainText(NAME);
-  await expect(expected).toContainText(EMAIL);
-  await expect(expected).toContainText(CURRENT_ADDRESS);
-  await expect(expected).toContainText(PERMANENT_ADDRESS);
+  await expect(expected).toContainText([
+    NAME,
+    EMAIL,
+    CURRENT_ADDRESS,
+    PERMANENT_ADDRESS,
+  ]);
 });
