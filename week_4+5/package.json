@@ -1,0 +1,14 @@
+{
+  "name": "qa-project-automation-week-4",
+  "version": "1.0.0",
+  "description": "Week 4 structured Playwright project",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
+  }
+}
