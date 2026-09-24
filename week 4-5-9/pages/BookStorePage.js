@@ -1,6 +1,12 @@
 const { expect } = require('@playwright/test');
+const { appMessages } = require('../test-data/appMessages');
 
 class BookStorePage {
+  // demoqa.com's Book Store pages can take this long to render. Exposed here (not just
+  // used internally) so tests that wait on this same page don't each hardcode their own
+  // copy of the same number.
+  static SLOW_RENDER_TIMEOUT = 45_000;
+
   constructor(page) {
     this.page = page;
     this.expandedBookStoreList = page.locator('.element-list.accordion-collapse.collapse.show');
@@ -85,7 +91,7 @@ class BookStorePage {
   // Waiting for either an actual result or the explicit "no rows" message - rather than a
   // single fixed-timeout visibility check on results only - avoids misreading "hasn't
   // rendered yet" as "no matches", which the caller must not treat as equivalent.
-  async searchAndWaitForResults(searchText, timeout = 45_000) {
+  async searchAndWaitForResults(searchText, timeout = BookStorePage.SLOW_RENDER_TIMEOUT) {
     await this.searchBooks(searchText);
     await this.clickSearchButton();
     await expect
@@ -124,10 +130,17 @@ class BookStorePage {
     await this.searchResultBookLinks.filter({ hasText: title }).first().click();
   }
 
+  // Goes to Book Store, searches for the exact title, and opens that book's page.
+  async searchAndOpenBook(title) {
+    await this.openBookStoreFromMenu();
+    await this.searchAndWaitForResults(title);
+    await this.openBookByTitle(title);
+  }
+
   async addCurrentBookToCollection() {
     this.page.once('dialog', async (dialog) => {
       this.lastAddToCollectionMessage = dialog.message();
-      expect(dialog.message()).toMatch(/Book added to your collection|already present in the your collection/);
+      expect(dialog.message()).toMatch(new RegExp(`${appMessages.BOOK_ADDED}|${appMessages.BOOK_ALREADY_PRESENT}`));
       await dialog.accept();
     });
 

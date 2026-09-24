@@ -1,3 +1,5 @@
+const { generateUniqueUser } = require('../test-data/bookStoreCredentials');
+
 async function readBody(response) {
   const rawBody = await response.text();
   return rawBody ? JSON.parse(rawBody) : null;
@@ -18,8 +20,9 @@ async function generateToken(request, credentials) {
   return postCredentials(request, '/Account/v1/GenerateToken', credentials);
 }
 
-// Not used by any test yet - kept ready for a planned test (see backlog in
-// docs/book-store-test-plan.md) that checks this endpoint's documented quirk.
+// Not used by any test yet - keeping it ready for whenever someone writes a test
+// for this endpoint's quirk: it returns 404 "User not found!" instead of false
+// for a wrong password.
 async function isAuthorized(request, credentials) {
   return postCredentials(request, '/Account/v1/Authorized', credentials);
 }
@@ -33,6 +36,15 @@ async function deleteUser(request, userId, token) {
     headers: { Authorization: `Bearer ${token}` },
   });
   return { status: response.status() };
+}
+
+// Creates one fresh, unique account through the API and returns its credentials plus
+// the ids needed for later API calls (userId, token).
+async function createApiAccount(request) {
+  const credentials = generateUniqueUser();
+  const { body: created } = await createUser(request, credentials);
+  const { body: tokenBody } = await generateToken(request, credentials);
+  return { ...credentials, userId: created.userID, token: tokenBody.token };
 }
 
 async function getUser(request, userId, token) {
@@ -78,6 +90,7 @@ module.exports = {
   isAuthorized,
   createUser,
   deleteUser,
+  createApiAccount,
   getUser,
   getAllBooks,
   addBooksToCollection,

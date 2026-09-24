@@ -1,13 +1,13 @@
 const base = require('@playwright/test');
 const { HomePage } = require('../pages/HomePage');
 const { BookStorePage } = require('../pages/BookStorePage');
-const { bookStoreCredentials, generateUniqueUser } = require('../test-data/bookStoreCredentials');
+const { bookStoreCredentials } = require('../test-data/bookStoreCredentials');
 const {
   login,
   generateToken,
-  createUser,
   deleteUser,
   deleteAllBooksFromCollection,
+  createApiAccount,
 } = require('../helpers/bookStoreApi');
 
 // demoqa.com serves Google ad iframes that can visually cover the book table and make
@@ -70,13 +70,11 @@ const test = base.test.extend({
   // Creates a disposable user via the API for tests that need their own isolated
   // account, and deletes that user via the API afterwards regardless of test outcome.
   apiUser: async ({ request }, use) => {
-    const credentials = generateUniqueUser();
-    const { body: created } = await createUser(request, credentials);
-    const { body: tokenBody } = await generateToken(request, credentials);
+    const account = await createApiAccount(request);
 
-    await use({ ...credentials, userId: created.userID, token: tokenBody.token });
+    await use(account);
 
-    await deleteUser(request, created.userID, tokenBody.token);
+    await deleteUser(request, account.userId, account.token);
   },
 });
 

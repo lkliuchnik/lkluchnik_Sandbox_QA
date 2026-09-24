@@ -2,15 +2,6 @@ const { test, expect } = require('../fixtures/app.fixture');
 const { getAllBooks, addBooksToCollection, getUser, deleteBookFromCollection } = require('../helpers/bookStoreApi');
 const { httpStatus } = require('../test-data/httpStatus');
 
-// Adds books through the API, then checks with the API that they were really saved.
-// We add through the API instead of the "Add To Your Collection" popup because it's
-// faster and more stable for setup, and we verify through the API instead of the
-// browser because the app's "My Books" list never reloads from the server - a book
-// added through the API would never show up in the UI even though it's really saved
-// (see docs/book-store-test-plan.md for details).
-//
-// Precondition: bookStoreCollection empties the shared account's collection.
-// Cleanup: bookStoreCollection empties it again.
 test('BookStoreCollectionApi - books added via the API are persisted and retrievable via the API', async ({
   request,
   bookStoreCollection,
@@ -31,12 +22,6 @@ test('BookStoreCollectionApi - books added via the API are persisted and retriev
   expect(ownedIsbns).toContain(secondBook.isbn);
 });
 
-// Negative case: deleting a book (by ISBN) that the account does not own should be
-// rejected by the API.
-//
-// Precondition: collection starts empty, so no book is owned - any catalog ISBN
-// counts as "not owned" here.
-// Cleanup: bookStoreCollection empties the collection again.
 test('BookStoreCollectionApi - deleting an ISBN the account does not own is rejected', async ({
   request,
   bookStoreCollection,
