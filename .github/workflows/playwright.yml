@@ -18,7 +18,19 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - name: Fast lane (pure API / stable UI tests)
+        run: npx playwright test --grep-invert "@flaky-site" --workers=4
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-report/fast
+      - name: Slow lane (tests that touch demoqa.com's unstable search/Profile rendering)
+        id: slow_lane
+        if: always()
+        run: npx playwright test --grep "@flaky-site" --workers=1
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-report/slow
+      - name: Note known flakiness in the job summary
+        if: always() && steps.slow_lane.outcome == 'failure'
+        run: echo "⚠️ Slow-lane (UI search) tests failed. Check helpers/instability-investigation.md first - this may be known demoqa.com flakiness, not a regression." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

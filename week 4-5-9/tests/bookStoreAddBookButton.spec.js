@@ -3,7 +3,7 @@ const { getAllBooks, getUser } = require('../helpers/bookStoreApi');
 const { appMessages } = require('../test-data/appMessages');
 const { BookStorePage } = require('../pages/BookStorePage');
 
-test('BookStoreAddBookButton - adding a book persists it via the API', async ({
+test('BookStoreAddBookButton - adding a book persists it via the API', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
   bookStoreCollection,
@@ -23,7 +23,7 @@ test('BookStoreAddBookButton - adding a book persists it via the API', async ({
   expect(ownedIsbns).toContain(book.isbn);
 });
 
-test('BookStoreAddBookButton - adding the same book twice reports it as already present', async ({
+test('BookStoreAddBookButton - adding the same book twice reports it as already present', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
   bookStoreCollection,

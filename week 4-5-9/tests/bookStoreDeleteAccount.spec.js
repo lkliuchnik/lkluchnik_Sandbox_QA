@@ -4,7 +4,7 @@ const { httpStatus } = require('../test-data/httpStatus');
 const { appMessages } = require('../test-data/appMessages');
 const { BookStorePage } = require('../pages/BookStorePage');
 
-test('BookStoreDeleteAccount - a deleted account can no longer log in', async ({
+test('BookStoreDeleteAccount - a deleted account can no longer log in', { tag: '@flaky-site' }, async ({
   request,
   bookStoreLandingPage,
   apiUser,

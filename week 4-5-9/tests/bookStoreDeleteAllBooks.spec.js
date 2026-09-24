@@ -4,7 +4,7 @@ const { BookStorePage } = require('../pages/BookStorePage');
 
 const { SLOW_RENDER_TIMEOUT } = BookStorePage;
 
-test('BookStoreDeleteAllBooks - clicking Delete All Books empties the collection', async ({
+test('BookStoreDeleteAllBooks - clicking Delete All Books empties the collection', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
   bookStoreCollection,
@@ -33,7 +33,7 @@ test('BookStoreDeleteAllBooks - clicking Delete All Books empties the collection
   expect(user.books).toEqual([]);
 });
 
-test('BookStoreDeleteAllBooks - clicking it with an already-empty collection is a safe no-op', async ({
+test('BookStoreDeleteAllBooks - clicking it with an already-empty collection is a safe no-op', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
   bookStoreCollection,

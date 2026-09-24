@@ -4,7 +4,7 @@ const { BookStorePage } = require('../pages/BookStorePage');
 
 const { SLOW_RENDER_TIMEOUT } = BookStorePage;
 
-test("BookStoreAccountIsolation - one account's books do not show up for another account", async ({
+test("BookStoreAccountIsolation - one account's books do not show up for another account", { tag: '@flaky-site' }, async ({
   request,
   bookStoreLandingPage,
 }) => {

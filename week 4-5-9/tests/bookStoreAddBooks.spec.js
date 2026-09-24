@@ -1,7 +1,7 @@
 const { test, expect } = require('../fixtures/app.fixture');
 const { BookStorePage } = require('../pages/BookStorePage');
 
-test('BookStoreAddBooks - all search results get added to the collection', async ({
+test('BookStoreAddBooks - all search results get added to the collection', { tag: '@flaky-site' }, async ({
   loggedInBookStore,
   bookStoreCollection,
 }) => {

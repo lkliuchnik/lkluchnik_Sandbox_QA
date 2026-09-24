@@ -2,7 +2,7 @@ const { test, expect } = require('../fixtures/app.fixture');
 const { getAllBooks, getUser, deleteAllBooksFromCollection } = require('../helpers/bookStoreApi');
 const { BookStorePage } = require('../pages/BookStorePage');
 
-test('BookStoreProfileSync - a book added via the UI is confirmed server-side and removed via the API', async ({
+test('BookStoreProfileSync - a book added via the UI is confirmed server-side and removed via the API', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
   bookStoreCollection,

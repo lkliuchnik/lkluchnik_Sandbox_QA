@@ -4,7 +4,7 @@ const { BookStorePage } = require('../pages/BookStorePage');
 
 const { SLOW_RENDER_TIMEOUT } = BookStorePage;
 
-test('BookStoreDeleteBook - deleting one book removes only that book', async ({
+test('BookStoreDeleteBook - deleting one book removes only that book', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
   bookStoreCollection,
@@ -36,7 +36,7 @@ test('BookStoreDeleteBook - deleting one book removes only that book', async ({
   expect(ownedIsbns).toContain(bookToKeep.isbn);
 });
 
-test('BookStoreDeleteBook - deleting the only book empties the profile', async ({
+test('BookStoreDeleteBook - deleting the only book empties the profile', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
   bookStoreCollection,

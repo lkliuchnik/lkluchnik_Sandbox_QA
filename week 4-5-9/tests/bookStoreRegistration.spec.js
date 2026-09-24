@@ -6,7 +6,7 @@ const { BookStorePage } = require('../pages/BookStorePage');
 
 const { SLOW_RENDER_TIMEOUT } = BookStorePage;
 
-test('BookStoreRegistration - a freshly API-created user can log in via the UI with an empty collection', async ({
+test('BookStoreRegistration - a freshly API-created user can log in via the UI with an empty collection', { tag: '@flaky-site' }, async ({
   bookStoreLandingPage,
   apiUser,
 }) => {
@@ -30,7 +30,7 @@ test('BookStoreRegistration - registering an already-existing username via the A
   expect(body.message).toBe('User exists!');
 });
 
-test('BookStoreRegistration - a duplicate name fails, then a fresh unique name works', async ({
+test('BookStoreRegistration - a duplicate name fails, then a fresh unique name works', { tag: '@flaky-site' }, async ({
   request,
   bookStoreLandingPage,
   apiUser,
