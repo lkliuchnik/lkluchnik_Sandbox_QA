@@ -155,7 +155,6 @@ activemq-data/
 env/
 venv/
 ENV/
-week 4-5-9/.env
 env.bak/
 venv.bak/
 
@@ -222,6 +221,6 @@ __marimo__/
 # Claude Code session logs (local working memory, not shared)
 .claude/session-log/
 
-# Playwright generated output (week 4-5-9)
-week 4-5-9/test-results/
-week 4-5-9/playwright-report/
+# Playwright generated output
+test-results/
+playwright-report/

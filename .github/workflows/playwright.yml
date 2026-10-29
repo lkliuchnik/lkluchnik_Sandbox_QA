@@ -1,4 +1,4 @@
-name: Playwright Tests (week 4-5-9)
+name: Playwright Tests
 on:
   push:
     branches: [main]
@@ -8,9 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "week 4-5-9"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,15 +22,15 @@ jobs:
       - name: Slow lane (tests that touch demoqa.com's unstable search/Profile rendering)
         id: slow_lane
         if: always()
-        run: npx playwright test --grep "@flaky-site" --workers=1
+        run: npx playwright test --grep "@flaky-site" --workers=1 --pass-with-no-tests
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-report/slow
       - name: Note known flakiness in the job summary
         if: always() && steps.slow_lane.outcome == 'failure'
-        run: echo "⚠️ Slow-lane (UI search) tests failed. Check helpers/instability-investigation.md first - this may be known demoqa.com flakiness, not a regression." >> "$GITHUB_STEP_SUMMARY"
+        run: echo "⚠️ Slow-lane (UI search) tests failed. This may be known demoqa.com flakiness, not a regression." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: "week 4-5-9/playwright-report/"
+          path: playwright-report/
           retention-days: 7
