@@ -1,22 +1,19 @@
-const { test } = require('../fixtures/app.fixture');
+const { test, expect } = require('../fixtures/app.fixture');
 const { BookStorePage } = require('../pages/BookStorePage');
 
-test('BookStoreAddBooks', async ({ loggedInBookStore }) => {
+test('BookStoreAddBooks - all search results get added to the collection', { tag: '@flaky-site' }, async ({
+  loggedInBookStore,
+  bookStoreCollection,
+}) => {
   /** @type {BookStorePage} */
   const bookStore = loggedInBookStore;
   const searchText = 'JavaScript';
 
   await bookStore.openBookStoreFromMenu();
-  await bookStore.searchBooks(searchText);
-  await bookStore.clickSearchButton();
+  await bookStore.searchAndWaitForResults(searchText);
 
-  const booksToAdd = await bookStore.getSearchResultBookTitles();
-
-  if (booksToAdd.length === 0) {
-    await bookStore.expectSearchResultsEmpty();
-    //if not books found we just return from the test
-    return;
-  }
+  const booksToAdd = await bookStore.getVisibleBookTitles();
+  expect(booksToAdd.length).toBeGreaterThan(0);
 
   for (const bookTitle of booksToAdd) {
     await bookStore.openBookByTitle(bookTitle);
@@ -24,7 +21,6 @@ test('BookStoreAddBooks', async ({ loggedInBookStore }) => {
   }
 
   await bookStore.openProfileFromMenu();
-  await bookStore.searchBooks(searchText);
-  await bookStore.clickSearchButton();
+  await bookStore.searchAndWaitForResults(searchText);
   await bookStore.expectSearchResultsMatchTitlesAndCount(booksToAdd);
 });

@@ -4,7 +4,10 @@
   "description": "QA Test Automation Project",
   "scripts": {
     "test": "npx playwright test",
+    "test:fast": "npx playwright test --grep-invert \"@flaky-site\"",
+    "test:slow": "npx playwright test --grep \"@flaky-site\" --workers=1",
     "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
     "report": "npx playwright show-report"
   },
   "devDependencies": {

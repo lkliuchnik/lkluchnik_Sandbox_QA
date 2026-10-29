@@ -1,6 +1,10 @@
 const { test } = require('../fixtures/app.fixture');
+const { BookStorePage } = require('../pages/BookStorePage');
 
 test('BookStoreLogout', async ({ loggedInBookStore }) => {
-  await loggedInBookStore.clickLogout();
-  await loggedInBookStore.expectLoginInBookStoreVisible();
+  /** @type {BookStorePage} */
+  const bookStore = loggedInBookStore;
+
+  await bookStore.clickLogout();
+  await bookStore.expectLoginInBookStoreVisible();
 });
