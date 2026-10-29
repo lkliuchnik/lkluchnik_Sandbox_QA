@@ -1,0 +1,58 @@
+name: E2E tests (Book Store)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# All runs share one demoqa.com account, and a new login invalidates its previous token,
+# so two runs at the same time would break each other. Queue them instead.
+concurrency:
+  group: demoqa-shared-account
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Fast lane (API and stable UI tests)
+        run: npm run test:fast
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-report/fast
+
+      - name: Slow lane (tests that touch demoqa.com search and Profile rendering)
+        id: slow_lane
+        if: ${{ !cancelled() }}
+        run: npm run test:slow
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-report/slow
+
+      - name: Note known flakiness in the job summary
+        if: ${{ !cancelled() && steps.slow_lane.outcome == 'failure' }}
+        run: >-
+          echo "Slow-lane tests failed. Check tests/e2e/helpers/instability-investigation.md first -
+          this may be known demoqa.com flakiness, not a regression." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload HTML reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

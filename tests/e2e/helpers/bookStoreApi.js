@@ -47,6 +47,13 @@ async function createApiAccount(request) {
   return { ...credentials, userId: created.userID, token: tokenBody.token };
 }
 
+// Deletes an account made by createApiAccount(). Gets a fresh token first, because a UI
+// login with this account during the test has already invalidated account.token.
+async function deleteApiAccount(request, account) {
+  const { body: tokenBody } = await generateToken(request, account);
+  return deleteUser(request, account.userId, tokenBody.token);
+}
+
 async function getUser(request, userId, token) {
   const response = await request.get(`/Account/v1/User/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -91,6 +98,7 @@ module.exports = {
   createUser,
   deleteUser,
   createApiAccount,
+  deleteApiAccount,
   getUser,
   getAllBooks,
   addBooksToCollection,

@@ -18,6 +18,8 @@ test('BookStoreAddBooks - all search results get added to the collection', { tag
   for (const bookTitle of booksToAdd) {
     await bookStore.openBookByTitle(bookTitle);
     await bookStore.addCurrentBookToCollection();
+    await bookStore.clickBackToBookStore();
+    await bookStore.searchAndWaitForResults(searchText);
   }
 
   await bookStore.openProfileFromMenu();

@@ -1,5 +1,5 @@
 const { test, expect } = require('../fixtures/app.fixture');
-const { getAllBooks, getUser, deleteUser, createApiAccount } = require('../helpers/bookStoreApi');
+const { getAllBooks, getUser, createApiAccount, deleteApiAccount } = require('../helpers/bookStoreApi');
 const { BookStorePage } = require('../pages/BookStorePage');
 
 const { SLOW_RENDER_TIMEOUT } = BookStorePage;
@@ -19,19 +19,21 @@ test("BookStoreAccountIsolation - one account's books do not show up for another
     const [book] = catalog.books;
 
     await bookStore.loginAs(userA.userName, userA.password);
+    await bookStore.expectUserName(userA.userName);
     await bookStore.searchAndOpenBook(book.title);
     await bookStore.addCurrentBookToCollection();
 
     await bookStore.clickLogout();
 
     await bookStore.loginAs(userB.userName, userB.password);
+    await bookStore.expectUserName(userB.userName);
     await bookStore.openProfileFromMenu();
     await bookStore.expectSearchResultsEmpty(SLOW_RENDER_TIMEOUT);
 
-    const { body: userBData } = await getUser(request, userB.userId, userB.token);
+    const { body: userBData } = await getUser(request, userB.userId, await bookStore.getSessionToken());
     expect(userBData.books).toEqual([]);
   } finally {
-    await deleteUser(request, userA.userId, userA.token);
-    await deleteUser(request, userB.userId, userB.token);
+    await deleteApiAccount(request, userA);
+    await deleteApiAccount(request, userB);
   }
 });

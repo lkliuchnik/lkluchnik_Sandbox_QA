@@ -5,9 +5,9 @@ const { bookStoreCredentials } = require('../test-data/bookStoreCredentials');
 const {
   login,
   generateToken,
-  deleteUser,
   deleteAllBooksFromCollection,
   createApiAccount,
+  deleteApiAccount,
 } = require('../helpers/bookStoreApi');
 
 // demoqa.com serves Google ad iframes that can visually cover the book table and make
@@ -43,8 +43,29 @@ const test = base.test.extend({
     await use(bookStorePage);
   },
 
-  loggedInBookStore: async ({ bookStoreLandingPage, credentials }, use) => {
-    await bookStoreLandingPage.loginAs(credentials.userName, credentials.password);
+  // demoqa.com keeps only the latest token of a user valid - a UI login or a new
+  // generateToken() call kills the previous one. So the browser (loggedInBookStore) and
+  // the API calls (bookStoreCollection) share this one session instead of each logging in.
+  defaultUserSession: async ({ request, credentials }, use) => {
+    // Login also returns a "token", but it does not always work for later API
+    // calls (we saw random 401 errors). Only the token from generateToken() is
+    // reliable, so keep both calls - do not remove generateToken() to "simplify" this.
+    const { body: tokenBody } = await generateToken(request, credentials);
+    const { body: loginBody } = await login(request, credentials);
+    await use({ userId: loginBody.userId, token: tokenBody.token, expires: tokenBody.expires });
+  },
+
+  // Logs the browser in with the API session's token (as the cookies the login form would
+  // set), not via the form - the form itself is covered by bookStoreLogin.spec.js.
+  loggedInBookStore: async ({ page, baseURL, bookStoreLandingPage, credentials, defaultUserSession }, use) => {
+    const { userId, token, expires } = defaultUserSession;
+    await page.context().addCookies([
+      { name: 'token', value: token, url: baseURL },
+      { name: 'userID', value: userId, url: baseURL },
+      { name: 'userName', value: credentials.userName, url: baseURL },
+      { name: 'expires', value: expires, url: baseURL },
+    ]);
+    await page.reload();
     await bookStoreLandingPage.expectUserName(credentials.userName);
     await bookStoreLandingPage.expectLogoutVisible();
     await use(bookStoreLandingPage);
@@ -53,14 +74,8 @@ const test = base.test.extend({
   // Precondition + cleanup for any test that touches the shared defaultUser's book
   // collection via the API: wipes it before the test and again after, so the shared
   // account always starts and ends empty regardless of what the test does in between.
-  bookStoreCollection: async ({ request, credentials }, use) => {
-    // Login also returns a "token", but it does not always work for later API
-    // calls (we saw random 401 errors). Only the token from generateToken() is
-    // reliable, so keep both calls - do not remove generateToken() to "simplify" this.
-    const { body: tokenBody } = await generateToken(request, credentials);
-    const { body: loginBody } = await login(request, credentials);
-    const userId = loginBody.userId;
-    const token = tokenBody.token;
+  bookStoreCollection: async ({ request, defaultUserSession }, use) => {
+    const { userId, token } = defaultUserSession;
 
     await deleteAllBooksFromCollection(request, userId, token);
     await use({ userId, token });
@@ -74,7 +89,7 @@ const test = base.test.extend({
 
     await use(account);
 
-    await deleteUser(request, account.userId, account.token);
+    await deleteApiAccount(request, account);
   },
 });
 

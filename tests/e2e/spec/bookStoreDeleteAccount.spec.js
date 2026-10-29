@@ -21,11 +21,12 @@ test('BookStoreDeleteAccount - a deleted account can no longer log in', { tag: '
   await bookStore.searchAndOpenBook(book.title);
   await bookStore.addCurrentBookToCollection();
 
-  const { body: userAfterAdd } = await getUser(request, apiUser.userId, apiUser.token);
+  const token = await bookStore.getSessionToken();
+  const { body: userAfterAdd } = await getUser(request, apiUser.userId, token);
   const ownedIsbns = userAfterAdd.books.map((b) => b.isbn);
   expect(ownedIsbns).toContain(book.isbn);
 
-  const { status: deleteStatus } = await deleteUser(request, apiUser.userId, apiUser.token);
+  const { status: deleteStatus } = await deleteUser(request, apiUser.userId, token);
   expect(deleteStatus).toBe(httpStatus.NO_CONTENT);
 
   await bookStore.clickLogout();

@@ -38,13 +38,15 @@ no signal for that beyond reading the failure message and recognizing the patter
    `--grep`/`--grep-invert "@flaky-site"`. See `npm run test:fast` / `npm run test:slow`
    in `package.json`.
 
-2. **Raised `workers` for the fast lane.** `playwright.config.js` still defaults to
-   `workers: 1` (right for the flaky UI lane - avoids piling up unstable browser
-   sessions), but `test:fast` overrides it to `--workers=4` on the CLI. Confirmed
-   locally: the fast lane (8 tests) now finishes in ~16s instead of waiting behind the
-   slow lane.
+2. **Raised `workers` for the fast lane - later reverted.** `test:fast` used to override
+   `workers: 1` with `--workers=4`, and the fast lane (8 tests) finished in ~16s. That
+   stopped working when demoqa.com started keeping only the latest token of a user
+   valid: the fast-lane tests all use the shared `defaultUser`, so parallel tests kept
+   invalidating each other's tokens ("Invalid username or password!", 401s). Both lanes
+   now run with the config's `workers: 1`; the lane split itself still keeps the fast
+   tests from waiting behind the slow ones.
 
-3. **Pointed first responders at the answer.** `.github/workflows/playwright.yml` now
+3. **Pointed first responders at the answer.** `.github/workflows/e2e-tests.yml` now
    runs the two lanes as separate steps (each with its own report folder via
    `PLAYWRIGHT_HTML_REPORT`, so neither overwrites the other), and if the slow lane
    specifically fails, a step writes a note straight into the GitHub Actions job

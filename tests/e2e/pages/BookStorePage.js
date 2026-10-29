@@ -20,8 +20,9 @@ class BookStorePage {
     this.userNameValue = page.locator('#userName-value');
     this.logoutButton = page.getByRole('button', { name: /log out|logout/i });
     this.searchInput = page.locator('#searchBox');
-    this.searchResultBookLinks = page.locator('.rt-tbody .rt-tr-group .rt-td a');
-    this.noRowsMessage = page.locator('.rt-noData');
+    this.searchResultBookLinks = page.locator('table tbody td a');
+    // The table has no "No rows found" element anymore - an empty result only shows "Page 1 of 0".
+    this.noRowsMessage = page.getByText(/^Page \d+ of 0$/);
     this.goToBookStoreButton = page.getByRole('button', { name: 'Go To Book Store' });
     this.backToBookStoreButton = page.getByRole('button', { name: 'Back To Book Store' });
     this.addToYourCollectionButton = page.getByRole('button', { name: 'Add To Your Collection' });
@@ -59,6 +60,13 @@ class BookStorePage {
 
   async expectLogoutVisible() {
     await expect(this.logoutButton).toBeVisible();
+  }
+
+  // A UI login invalidates any token the API got before it for the same user, so API calls
+  // made after a UI login must use the token the browser got.
+  async getSessionToken() {
+    const cookies = await this.page.context().cookies();
+    return cookies.find((cookie) => cookie.name === 'token').value;
   }
 
   async expectLoginError(message) {
@@ -137,14 +145,20 @@ class BookStorePage {
     await this.openBookByTitle(title);
   }
 
+  // The app confirms the add (or reports an error) in an alert once the server has answered,
+  // so waiting for that alert means the book is saved before the test checks it via the API.
   async addCurrentBookToCollection() {
-    this.page.once('dialog', async (dialog) => {
-      this.lastAddToCollectionMessage = dialog.message();
-      expect(dialog.message()).toMatch(new RegExp(`${appMessages.BOOK_ADDED}|${appMessages.BOOK_ALREADY_PRESENT}`));
-      await dialog.accept();
+    const dialogHandled = new Promise((resolve) => {
+      this.page.once('dialog', async (dialog) => {
+        this.lastAddToCollectionMessage = dialog.message();
+        await dialog.accept();
+        resolve();
+      });
     });
 
     await this.addToYourCollectionButton.click();
+    await dialogHandled;
+    expect(this.lastAddToCollectionMessage).toMatch(new RegExp(`${appMessages.BOOK_ADDED}|${appMessages.BOOK_ALREADY_PRESENT}`));
   }
 
   async openProfileFromMenu() {
@@ -179,9 +193,11 @@ class BookStorePage {
     await expect(this.searchResultBookLinks.filter({ hasText: title }).first()).toBeHidden({ timeout });
   }
 
+  // Polls, because the table briefly shows "Page 1 of 0" before the Profile's books load.
   async expectSearchResultsMatchTitlesAndCount(profileBooks) {
-    const searchResults = await this.getVisibleBookTitles();
-    expect(searchResults.sort()).toEqual([...profileBooks].sort());
+    await expect
+      .poll(async () => (await this.getVisibleBookTitles()).sort(), { timeout: BookStorePage.SLOW_RENDER_TIMEOUT })
+      .toEqual([...profileBooks].sort());
   }
 }
 
