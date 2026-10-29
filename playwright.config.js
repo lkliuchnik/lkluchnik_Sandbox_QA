@@ -1,5 +1,5 @@
 // @ts-check
-const { defineConfig, devices } = require('@playwright/test');
+const { defineConfig } = require('@playwright/test');
 const path = require('path');
 const dotenv = require('dotenv');
 
@@ -7,10 +7,14 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 module.exports = defineConfig({
   testDir: './tests',
+  timeout: 30_000,
+  expect: {
+    timeout: 5_000,
+  },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   outputDir: './test-results',
   reporter: [['html', { outputFolder: './playwright-report' }]],
   use: {

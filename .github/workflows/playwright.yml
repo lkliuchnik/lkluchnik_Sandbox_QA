@@ -16,7 +16,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Fast lane (pure API / stable UI tests)
-        run: npx playwright test --grep-invert "@flaky-site" --workers=4
+        run: npx playwright test --grep-invert "@flaky-site"
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-report/fast
       - name: Slow lane (tests that touch demoqa.com's unstable search/Profile rendering)
