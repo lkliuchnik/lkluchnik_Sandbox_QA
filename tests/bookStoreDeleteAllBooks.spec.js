@@ -4,7 +4,7 @@ const { BookStorePage } = require('../pages/BookStorePage');
 
 const { SLOW_RENDER_TIMEOUT } = BookStorePage;
 
-// known bug: adds books via API, then waits for them in the UI - the UI never shows them. See helpers/test-scenarios.md.
+// known bug: adds books via API, then waits for them in the UI - the UI never shows them. See docs/test-scenarios.md.
 test.fixme('BookStoreDeleteAllBooks - clicking Delete All Books empties the collection', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,

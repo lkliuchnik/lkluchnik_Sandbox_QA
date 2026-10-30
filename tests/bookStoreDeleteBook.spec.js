@@ -4,7 +4,7 @@ const { BookStorePage } = require('../pages/BookStorePage');
 
 const { SLOW_RENDER_TIMEOUT } = BookStorePage;
 
-// known bug: adds books via API, then waits for them in the UI - the UI never shows them. See helpers/test-scenarios.md.
+// known bug: adds books via API, then waits for them in the UI - the UI never shows them. See docs/test-scenarios.md.
 test.fixme('BookStoreDeleteBook - deleting one book removes only that book', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,
@@ -35,7 +35,7 @@ test.fixme('BookStoreDeleteBook - deleting one book removes only that book', { t
   expect(ownedIsbns).toContain(bookToKeep.isbn);
 });
 
-// known bug: adds a book via API, then waits for it in the UI - the UI never shows it. See helpers/test-scenarios.md.
+// known bug: adds a book via API, then waits for it in the UI - the UI never shows it. See docs/test-scenarios.md.
 test.fixme('BookStoreDeleteBook - deleting the only book empties the profile', { tag: '@flaky-site' }, async ({
   request,
   loggedInBookStore,

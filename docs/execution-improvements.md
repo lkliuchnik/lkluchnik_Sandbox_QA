@@ -14,7 +14,7 @@ between two groups of tests:
   three tests in `bookStoreRegistration.spec.js`) is the opposite: slow (they can eat
   the whole 45s timeout) and unpredictable, because demoqa.com's own search/Profile
   rendering is unstable. That's on the site, not on the tests (I ran into this exact
-  thing while chasing down a flaky run - see `helpers/instability-investigation.md`).
+  thing while chasing down a flaky run - see `docs/instability-investigation.md`).
   Note this split is per-test, not per-file - `bookStoreRegistration.spec.js` has one
   test of each kind.
 - Meanwhile `playwright.config.js` has `workers: 1` for the entire suite, so
@@ -50,7 +50,7 @@ no signal for that beyond reading the failure message and recognizing the patter
    runs the two lanes as separate steps (each with its own report folder via
    `PLAYWRIGHT_HTML_REPORT`, so neither overwrites the other), and if the slow lane
    specifically fails, a step writes a note straight into the GitHub Actions job
-   summary pointing at `helpers/instability-investigation.md`.
+   summary pointing at `docs/instability-investigation.md`.
 
 4. **Kept the existing failure artifacts as they were** (`trace: 'on-first-retry'`,
    `screenshot: 'only-on-failure'`, `video: 'retain-on-failure'`) - no change needed
@@ -60,4 +60,4 @@ no signal for that beyond reading the failure message and recognizing the patter
 One thing this didn't fix, and wasn't meant to: while verifying the fast lane, I saw
 `bookStoreCollectionApi.spec.js` itself fail/flake a couple of times on a `401` from
 the token endpoint. That's the separate Account API token flakiness already noted in
-`helpers/coverage-explanation.md`, not the search-rendering issue this split addresses.
+`docs/coverage-explanation.md`, not the search-rendering issue this split addresses.

@@ -2,7 +2,7 @@
 
 Ideas I jotted down while going through coverage but haven't turned into tests yet.
 Roughly sorted by how much value they'd give for how little work - for the full
-reasoning behind why these gaps exist in the first place, see `helpers/coverage-explanation.md`.
+reasoning behind why these gaps exist in the first place, see `docs/coverage-explanation.md`.
 
 ## P1 - cheap and immediately useful
 

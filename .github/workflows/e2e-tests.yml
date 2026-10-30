@@ -46,7 +46,7 @@ jobs:
       - name: Note known flakiness in the job summary
         if: ${{ !cancelled() && steps.slow_lane.outcome == 'failure' }}
         run: >-
-          echo "Slow-lane tests failed. Check tests/e2e/helpers/instability-investigation.md first -
+          echo "Slow-lane tests failed. Check docs/instability-investigation.md first -
           this may be known demoqa.com flakiness, not a regression." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload HTML reports
